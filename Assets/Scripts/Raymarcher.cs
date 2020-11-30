@@ -6,6 +6,8 @@ using UnityEngine;
 public class Raymarcher : MonoBehaviour
 {
     public Shader shader;
+    public float maxDistance = 100.0f;
+    public int maxSteps = 50;
 
     private Camera mainCamera;
     private Material material;
@@ -14,6 +16,8 @@ public class Raymarcher : MonoBehaviour
     private Vector4[] screenTriangleCorners = new Vector4[3];
 
     private int screenTriangleCornersId = Shader.PropertyToID("_ScreenTriangleCorners");
+    private int maxDistanceId = Shader.PropertyToID("_MaxDistance");
+    private int maxStepsId = Shader.PropertyToID("_MaxSteps");
 
     private void Start()
     {
@@ -39,6 +43,8 @@ public class Raymarcher : MonoBehaviour
         screenTriangleCorners[2] = mainCamera.transform.TransformVector(screenTriangleCorners[2]) / mainCamera.farClipPlane;
 
         material.SetVectorArray(screenTriangleCornersId, screenTriangleCorners);
+        material.SetFloat(maxDistanceId, maxDistance);
+        material.SetFloat(maxStepsId, maxSteps);
 
         Graphics.Blit(source, destination, material);
     }
