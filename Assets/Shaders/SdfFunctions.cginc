@@ -25,6 +25,11 @@ float UnionSDF(float distA, float distB)
     return min(distA, distB);
 }
 
+float DifferenceSDF(float distA, float distB)
+{
+    return max(distA, -distB);
+}
+
 float SceneSDF(float3 pos)
 {
     float sphereDist = SphereSDF(pos, float3(0, 0, 0), 1.0);
