@@ -21,8 +21,7 @@
 
             #include "UnityCG.cginc"
             #include "SdfFunctions.cginc"
-
-            #define EPSILON 0.0001
+            #include "LightingFunctions.cginc"
 
             struct appdata
             {
@@ -41,6 +40,8 @@
             float4 _ScreenTriangleCorners[3];
             float _MaxDistance;
             float _MaxSteps;
+            float3 _LightPos;
+            float3 _LightColor;
 
             v2f vert (appdata v)
             {
@@ -67,12 +68,22 @@
                 float3 curPos = _WorldSpaceCameraPos.xyz;
                 float distance = 0;
                 float4 color = 0;
+
+                float3 diffuse = float3(0.7, 0.2, 0.2);
+                float3 specular = float3(1.0, 1.0, 1.0);
+                float shininess = 10.0;
+
+
+
                 for (int i = 0; (i < _MaxSteps) && (distance < _MaxDistance); i++)
                 {
                     float stepDistance = SceneSDF(curPos);
                     if (stepDistance < EPSILON)
                     {
-                        color = 1;
+                        float3 normal = EstimateNormal(curPos);
+                        color.rgb = PhongLighting(diffuse, specular, shininess, curPos, normal, 
+                                                  _WorldSpaceCameraPos.xyz, _LightPos, _LightColor);
+                        color.a = 1;
                         break;
                     }
                     distance += stepDistance;
@@ -80,7 +91,7 @@
                 }
 
                 float4 mainTex = _MainTex.Sample(sampler_bilinear_clamp, IN.uv);
-                return mainTex + color;
+                return lerp(mainTex, color, color.a);
             }
             ENDHLSL
         }
