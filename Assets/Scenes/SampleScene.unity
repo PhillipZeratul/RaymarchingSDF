@@ -312,8 +312,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shader: {fileID: 4800000, guid: 155f9f20bc8810341b3f17d22045e89d, type: 3}
-  maxDistance: 100
-  maxSteps: 50
+  maxDistance: 20
+  maxSteps: 70
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0

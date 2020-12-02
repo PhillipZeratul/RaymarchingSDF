@@ -19,7 +19,6 @@
             #pragma vertex vert
             #pragma fragment frag
 
-            #include "UnityCG.cginc"
             #include "SdfFunctions.cginc"
             #include "LightingFunctions.cginc"
 
@@ -73,14 +72,12 @@
                 float3 specular = float3(1.0, 1.0, 1.0);
                 float shininess = 10.0;
 
-
-
                 for (int i = 0; (i < _MaxSteps) && (distance < _MaxDistance); i++)
                 {
                     float stepDistance = SceneSDF(curPos);
-                    if (stepDistance < EPSILON)
+                    if (stepDistance < EPSILON * distance)
                     {
-                        float3 normal = EstimateNormal(curPos);
+                        float3 normal = CalculateNormal(curPos, 0.0005);
                         color.rgb = PhongLighting(diffuse, specular, shininess, curPos, normal, 
                                                   _WorldSpaceCameraPos.xyz, _LightPos, _LightColor);
                         color.a = 1;

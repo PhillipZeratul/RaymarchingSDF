@@ -1,7 +1,10 @@
 #ifndef SDF_FUNCTIONS
 #define SDF_FUNCTIONS
 
-#define EPSILON 0.001
+#include "UnityCG.cginc"
+
+#define EPSILON 0.0001
+#define ZERO (min(_Time.x, 0))
 
 float SphereSDF(float3 pos, float3 center, float radius)
 {
@@ -33,18 +36,21 @@ float DifferenceSDF(float distA, float distB)
 float SceneSDF(float3 pos)
 {
     float sphereDist = SphereSDF(pos, float3(0, 0, 0), 1.0);
-    float boxDist = BoxSDF(pos, float3(2, 1, 0), float3(1, 2, 3));
+    float boxDist = BoxSDF(pos, float3(3, 1, 0), float3(1, 2, 3));
     
     return UnionSDF(sphereDist, boxDist);
 }
 
-float3 EstimateNormal(float3 pos)
+//https://iquilezles.org/www/articles/normalsSDF/normalsSDF.htm
+float3 CalculateNormal(float3 pos, float h)
 {
-    float3 normal = float3(
-        SceneSDF(float3(pos.x + EPSILON, pos.y, pos.z)) - SceneSDF(float3(pos.x - EPSILON, pos.y, pos.z)),
-        SceneSDF(float3(pos.x, pos.y + EPSILON, pos.z)) - SceneSDF(float3(pos.x, pos.y - EPSILON, pos.z)),
-        SceneSDF(float3(pos.x, pos.y, pos.z + EPSILON)) - SceneSDF(float3(pos.x, pos.y, pos.z - EPSILON)));
-    return normalize(normal);
+    float3 n = 0.0;
+    for (int i = ZERO; i < 4; i++)
+    {
+        float3 e = 0.5773 * (2.0 * float3((((i + 3) >> 1) & 1), ((i >> 1) & 1), (i & 1)) - 1.0);
+        n += e * SceneSDF(pos + h * e).x;
+    }
+    return normalize(n);
 }
 
 #endif //SDF_FUNCTIONS
